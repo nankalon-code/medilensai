@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { FileText, ArrowRight, Activity } from "lucide-react";
+import { Link } from "react-router-dom";
 import heroImg from "@/assets/hero-health.jpg";
 
 const Navbar = () => (
