@@ -13,18 +13,21 @@ export default {
       },
     },
     fontFamily: {
-      display: ['"Playfair Display"', 'serif'],
-      body: ['"DM Sans"', 'sans-serif'],
+      display: ['"Space Grotesk"', 'sans-serif'],
+      body: ['"Inter"', 'sans-serif'],
     },
     extend: {
       colors: {
-        gold: {
-          DEFAULT: "hsl(var(--gold))",
-          glow: "hsl(var(--gold-glow))",
-          dim: "hsl(var(--gold-dim))",
+        teal: {
+          DEFAULT: "hsl(var(--teal))",
+          glow: "hsl(var(--teal-glow))",
+          dim: "hsl(var(--teal-dim))",
         },
-        ember: "hsl(var(--ember))",
-        "warm-surface": "hsl(var(--warm-surface))",
+        cyan: "hsl(var(--cyan))",
+        "health-green": "hsl(var(--health-green))",
+        "health-yellow": "hsl(var(--health-yellow))",
+        "health-red": "hsl(var(--health-red))",
+        "health-surface": "hsl(var(--health-surface))",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
