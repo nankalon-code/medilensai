@@ -12,7 +12,7 @@ const Footer = () => (
           <span className="font-display font-bold text-foreground">MediLens</span>
         </div>
         <p className="text-muted-foreground text-sm font-body">
-          Built for Protex Hackathon 2026 — Open Innovation Track
+          © {new Date().getFullYear()} MediLens — AI-Powered Health Insights
         </p>
         <div className="flex items-center gap-4">
           <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
