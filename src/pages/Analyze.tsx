@@ -15,6 +15,7 @@ import {
   Shield,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import PdfUploadZone from "@/components/analyze/PdfUploadZone";
 import { toast } from "sonner";
 
 interface Metric {
@@ -167,6 +168,17 @@ const AnalyzePage = () => {
               </div>
 
               <div className="glass-card p-6">
+                <PdfUploadZone
+                  onTextExtracted={(text) => setReportText(text)}
+                  disabled={isAnalyzing}
+                />
+
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex-1 h-px bg-border" />
+                  <span className="text-xs text-muted-foreground font-body uppercase tracking-wider">or paste text</span>
+                  <div className="flex-1 h-px bg-border" />
+                </div>
+
                 <div className="flex items-center justify-between mb-4">
                   <label className="font-display font-semibold text-foreground flex items-center gap-2">
                     <FileText className="w-5 h-5 text-primary" />
