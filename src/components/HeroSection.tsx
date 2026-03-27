@@ -16,7 +16,8 @@ const Navbar = () => (
         <a href="#features" className="hover:text-foreground transition-colors">Features</a>
         <a href="#why-unique" className="hover:text-foreground transition-colors">Why Us</a>
         <a href="#demo" className="hover:text-foreground transition-colors">Demo</a>
-        <a href="#how" className="hover:text-foreground transition-colors">How It Works</a>
+        <Link to="/trends" className="hover:text-foreground transition-colors">Trends</Link>
+        <Link to="/chat" className="hover:text-foreground transition-colors">Chat</Link>
       </div>
       <Link to="/analyze" className="px-5 py-2 rounded-lg bg-primary text-primary-foreground font-body font-semibold text-sm hover:opacity-90 transition-opacity">
         Try Free
