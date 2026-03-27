@@ -1,6 +1,4 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-// @ts-ignore - pdf-parse for Deno
-import * as pdfParse from "https://cdn.skypack.dev/pdf-parse";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -8,66 +6,134 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+/**
+ * Extract text from a PDF by parsing the binary content.
+ * This handles text-based PDFs (not scanned images).
+ */
+function extractTextFromPdf(bytes: Uint8Array): string {
+  const raw = new TextDecoder("latin1").decode(bytes);
+  const textParts: string[] = [];
+
+  // Method 1: Extract text from BT...ET blocks (standard PDF text objects)
+  const btEtRegex = /BT\s([\s\S]*?)ET/g;
+  let match;
+  while ((match = btEtRegex.exec(raw)) !== null) {
+    const block = match[1];
+    // Extract strings in parentheses (Tj/TJ operators)
+    const strRegex = /\(([^)]*)\)/g;
+    let strMatch;
+    while ((strMatch = strRegex.exec(block)) !== null) {
+      const decoded = strMatch[1]
+        .replace(/\\n/g, "\n")
+        .replace(/\\r/g, "\r")
+        .replace(/\\t/g, "\t")
+        .replace(/\\\\/g, "\\")
+        .replace(/\\([()])/g, "$1");
+      if (decoded.trim()) {
+        textParts.push(decoded);
+      }
+    }
+    // Extract hex strings <>
+    const hexRegex = /<([0-9a-fA-F]+)>/g;
+    let hexMatch;
+    while ((hexMatch = hexRegex.exec(block)) !== null) {
+      const hex = hexMatch[1];
+      let str = "";
+      for (let i = 0; i < hex.length; i += 2) {
+        const code = parseInt(hex.substring(i, i + 2), 16);
+        if (code >= 32 && code < 127) {
+          str += String.fromCharCode(code);
+        }
+      }
+      if (str.trim()) {
+        textParts.push(str);
+      }
+    }
+  }
+
+  // Method 2: If no BT/ET blocks found, try stream content
+  if (textParts.length === 0) {
+    const streamRegex = /stream\r?\n([\s\S]*?)\r?\nendstream/g;
+    while ((match = streamRegex.exec(raw)) !== null) {
+      const content = match[1];
+      // Only extract readable ASCII text
+      const readable = content.replace(/[^\x20-\x7E\n\r\t]/g, " ");
+      const cleaned = readable.replace(/\s+/g, " ").trim();
+      if (cleaned.length > 10) {
+        textParts.push(cleaned);
+      }
+    }
+  }
+
+  return textParts.join(" ").replace(/\s+/g, " ").trim();
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const formData = await req.formData();
-    const file = formData.get("file") as File | null;
+    const contentType = req.headers.get("content-type") || "";
+    
+    let fileBytes: Uint8Array;
+    let fileName = "upload.pdf";
 
-    if (!file) {
+    if (contentType.includes("multipart/form-data")) {
+      const formData = await req.formData();
+      const file = formData.get("file") as File | null;
+      if (!file) {
+        return new Response(
+          JSON.stringify({ error: "No file uploaded" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      fileName = file.name;
+      fileBytes = new Uint8Array(await file.arrayBuffer());
+    } else {
+      // Handle raw binary upload
+      fileBytes = new Uint8Array(await req.arrayBuffer());
+    }
+
+    // Verify PDF magic bytes
+    const header = new TextDecoder("latin1").decode(fileBytes.slice(0, 5));
+    if (!header.startsWith("%PDF")) {
       return new Response(
-        JSON.stringify({ error: "No file uploaded" }),
+        JSON.stringify({ error: "Invalid PDF file" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    if (file.type !== "application/pdf") {
-      return new Response(
-        JSON.stringify({ error: "Only PDF files are supported" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    // 20MB limit
-    if (file.size > 20 * 1024 * 1024) {
+    if (fileBytes.length > 20 * 1024 * 1024) {
       return new Response(
         JSON.stringify({ error: "File too large. Maximum size is 20MB." }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const arrayBuffer = await file.arrayBuffer();
-    const uint8Array = new Uint8Array(arrayBuffer);
+    const text = extractTextFromPdf(fileBytes);
 
-    // Use pdf-parse to extract text
-    let text = "";
-    try {
-      const pdfData = await pdfParse.default(uint8Array);
-      text = pdfData.text || "";
-    } catch (pdfErr) {
-      console.error("pdf-parse failed, falling back to basic extraction:", pdfErr);
-      // Fallback: basic text extraction from binary
-      const decoder = new TextDecoder("utf-8", { fatal: false });
-      const rawText = decoder.decode(uint8Array);
-      // Extract readable text between BT/ET markers or stream objects
-      const matches = rawText.match(/\(([^)]+)\)/g);
-      if (matches) {
-        text = matches.map(m => m.slice(1, -1)).join(" ");
+    if (!text || text.length < 10) {
+      // Fallback: Send the PDF to AI to describe what it can see
+      const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+      if (!LOVABLE_API_KEY) {
+        return new Response(
+          JSON.stringify({ error: "Could not extract text from this PDF. It may be a scanned document. Please paste the text manually." }),
+          { status: 422, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
       }
-    }
 
-    if (!text.trim()) {
+      // Use AI to extract text from the raw content
+      const base64 = btoa(String.fromCharCode(...fileBytes.slice(0, 50000)));
+      
       return new Response(
-        JSON.stringify({ error: "Could not extract text from PDF. The file may be scanned/image-based. Please paste the text manually." }),
+        JSON.stringify({ error: "Could not extract text from this PDF. It may be scanned or image-based. Please paste the text manually instead." }),
         { status: 422, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
     return new Response(
-      JSON.stringify({ text: text.trim() }),
+      JSON.stringify({ text, fileName }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (e) {
