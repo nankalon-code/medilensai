@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { FileText, ArrowRight, Activity } from "lucide-react";
+import { Link } from "react-router-dom";
 import heroImg from "@/assets/hero-health.jpg";
 
 const Navbar = () => (
@@ -16,9 +17,9 @@ const Navbar = () => (
         <a href="#demo" className="hover:text-foreground transition-colors">Demo</a>
         <a href="#how" className="hover:text-foreground transition-colors">How It Works</a>
       </div>
-      <button className="px-5 py-2 rounded-lg bg-primary text-primary-foreground font-body font-semibold text-sm hover:opacity-90 transition-opacity">
+      <Link to="/analyze" className="px-5 py-2 rounded-lg bg-primary text-primary-foreground font-body font-semibold text-sm hover:opacity-90 transition-opacity">
         Try Free
-      </button>
+      </Link>
     </div>
   </nav>
 );
@@ -72,13 +73,13 @@ const HeroSection = () => {
             transition={{ duration: 0.7, delay: 0.4 }}
             className="flex flex-col sm:flex-row gap-4 justify-center"
           >
-            <button className="group px-8 py-4 rounded-xl bg-gradient-to-r from-primary to-accent font-body font-semibold text-primary-foreground hover:opacity-90 transition-opacity glow-teal text-lg flex items-center justify-center gap-2">
+            <Link to="/analyze" className="group px-8 py-4 rounded-xl bg-gradient-to-r from-primary to-accent font-body font-semibold text-primary-foreground hover:opacity-90 transition-opacity glow-teal text-lg flex items-center justify-center gap-2">
               Upload Your Report
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
-            <button className="px-8 py-4 rounded-xl border border-primary/30 font-body font-medium text-foreground hover:bg-primary/5 transition-colors text-lg">
+            </Link>
+            <a href="#demo" className="px-8 py-4 rounded-xl border border-primary/30 font-body font-medium text-foreground hover:bg-primary/5 transition-colors text-lg text-center">
               See Demo
-            </button>
+            </a>
           </motion.div>
 
           {/* Trust badges */}
