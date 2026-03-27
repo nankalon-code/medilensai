@@ -1,5 +1,6 @@
 import HeroSection from "@/components/HeroSection";
 import FeaturesSection from "@/components/FeaturesSection";
+import WhyUnique from "@/components/WhyUnique";
 import HowItWorks from "@/components/HowItWorks";
 import ReportDemo from "@/components/ReportDemo";
 import Testimonials from "@/components/Testimonials";
@@ -12,6 +13,9 @@ const Index = () => {
       <HeroSection />
       <div id="features">
         <FeaturesSection />
+      </div>
+      <div id="why-unique">
+        <WhyUnique />
       </div>
       <div id="how">
         <HowItWorks />
