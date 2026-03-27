@@ -14,6 +14,7 @@ const Navbar = () => (
       </div>
       <div className="hidden md:flex items-center gap-8 font-body text-sm text-muted-foreground">
         <a href="#features" className="hover:text-foreground transition-colors">Features</a>
+        <a href="#why-unique" className="hover:text-foreground transition-colors">Why Us</a>
         <a href="#demo" className="hover:text-foreground transition-colors">Demo</a>
         <a href="#how" className="hover:text-foreground transition-colors">How It Works</a>
       </div>
