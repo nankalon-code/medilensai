@@ -12,8 +12,19 @@ export default {
         "2xl": "1400px",
       },
     },
+    fontFamily: {
+      display: ['"Playfair Display"', 'serif'],
+      body: ['"DM Sans"', 'sans-serif'],
+    },
     extend: {
       colors: {
+        gold: {
+          DEFAULT: "hsl(var(--gold))",
+          glow: "hsl(var(--gold-glow))",
+          dim: "hsl(var(--gold-dim))",
+        },
+        ember: "hsl(var(--ember))",
+        "warm-surface": "hsl(var(--warm-surface))",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
