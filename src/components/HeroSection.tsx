@@ -17,9 +17,9 @@ const Navbar = () => (
         <a href="#demo" className="hover:text-foreground transition-colors">Demo</a>
         <a href="#how" className="hover:text-foreground transition-colors">How It Works</a>
       </div>
-      <button className="px-5 py-2 rounded-lg bg-primary text-primary-foreground font-body font-semibold text-sm hover:opacity-90 transition-opacity">
+      <Link to="/analyze" className="px-5 py-2 rounded-lg bg-primary text-primary-foreground font-body font-semibold text-sm hover:opacity-90 transition-opacity">
         Try Free
-      </button>
+      </Link>
     </div>
   </nav>
 );

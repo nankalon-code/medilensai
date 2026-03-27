@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const CTASection = () => (
   <section className="py-24 relative overflow-hidden">
@@ -19,10 +20,10 @@ const CTASection = () => (
         <p className="text-muted-foreground text-lg font-body mb-10 max-w-xl mx-auto">
           Stop being confused by medical reports. Start making informed health decisions with AI-powered clarity.
         </p>
-        <button className="group px-10 py-5 rounded-xl bg-gradient-to-r from-primary to-accent font-body font-semibold text-primary-foreground hover:opacity-90 transition-opacity glow-teal text-lg inline-flex items-center gap-2">
+        <Link to="/analyze" className="group px-10 py-5 rounded-xl bg-gradient-to-r from-primary to-accent font-body font-semibold text-primary-foreground hover:opacity-90 transition-opacity glow-teal text-lg inline-flex items-center gap-2">
           Get Started — It's Free
           <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-        </button>
+        </Link>
       </motion.div>
     </div>
   </section>
